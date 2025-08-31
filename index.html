@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heatmap</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>html,body,#map{height:100%;margin:0}</style>
+</head><body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script>
+  // Parse pts=lat,lng;lat,lng;...
+  const qs=new URLSearchParams(location.search), s=qs.get('pts')||'';
+  const pts=s.split(';').map(p=>{
+    const [a,b]=p.split(','); const lat=parseFloat(a), lng=parseFloat(b);
+    return (isFinite(lat)&&isFinite(lng))?[lat,lng,0.6]:null;
+  }).filter(Boolean);
+
+  // Default center (Sharjah) if no points
+  const center = pts.length? [pts[0][0],pts[0][1]] : [25.346,55.420];
+
+  const map=L.map('map').setView(center, 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'}).addTo(map);
+  if (pts.length) L.heatLayer(pts,{radius:25, blur:20, maxZoom:17}).addTo(map);
+</script>
+</body></html>
